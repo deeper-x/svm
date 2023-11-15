@@ -8,7 +8,6 @@ Usage:
 ```
 
 Example:
-
 ```sh
 justorius@XC-1660  (main)$ go build 
 justorius@XC-1660  (main)$ ./svm patch
