@@ -7,6 +7,8 @@ Usage:
 ./svm [ show | all | major | minor | patch | undo ]
 ```
 
+Example:
+
 ```sh
 justorius@XC-1660  (main)$ go build 
 justorius@XC-1660  (main)$ ./svm patch
