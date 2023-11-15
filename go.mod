@@ -1,3 +1,3 @@
 module github.com/deeper-x/svm
 
-go 1.21.3
+go 1.21
