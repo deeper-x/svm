@@ -1,4 +1,4 @@
-#svm - Semantic Version management
+### svm - Semantic Version management [POC]
 
 With `svm` you can easily manage your project's semver. Set incrementally major, minor or patch number. 
 
