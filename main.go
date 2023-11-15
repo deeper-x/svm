@@ -111,8 +111,7 @@ func getCurVer() string {
 	args := os.Args
 
 	if len(args) != 2 {
-		fmt.Println(defaultOut)
-		return ""
+		return defaultOut
 	}
 
 	var semVer = bytes.NewBuffer(stdout).String()
