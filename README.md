@@ -1,8 +1,12 @@
 #svm - Semantic Version management
 
-With `svm` you can easily manage your project's semver
+With `svm` you can easily manage your project's semver. Set incrementally major, minor or patch number. 
 
 Usage:
+```sh
+./svm [ show | all | major | minor | patch | undo ]
+```
+
 ```sh
 justorius@XC-1660  (main)$ go build 
 justorius@XC-1660  (main)$ ./svm patch
