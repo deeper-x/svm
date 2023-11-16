@@ -47,7 +47,7 @@ v2.0.2
 # test
 
 ```sh
-justorius@XC-1660  (main)$ make unittest
+$ make unittest
 /usr/bin/go test -v ./...
 ?   	github.com/deeper-x/svm/settings	[no test files]
 === RUN   TestShow
@@ -55,7 +55,7 @@ justorius@XC-1660  (main)$ make unittest
 === RUN   TestPatch
 --- PASS: TestPatch (0.00s)
 === RUN   TestMinor
-2023/11/16 17:59:35 redo
+2023/11/16 20:58:51 redo
 --- PASS: TestMinor (0.00s)
 === RUN   TestMajor
 --- PASS: TestMajor (0.00s)
@@ -70,9 +70,9 @@ justorius@XC-1660  (main)$ make unittest
 === RUN   TestDelVer
 --- PASS: TestDelVer (0.00s)
 PASS
-ok  	github.com/deeper-x/svm	0.029s
-=== RUN   TestGetCurVer
---- PASS: TestGetCurVer (0.00s)
+ok  	github.com/deeper-x/svm	0.032s
+=== RUN   TestNewTag
+--- PASS: TestNewTag (0.00s)
 === RUN   TestCheckNumArgs
 --- PASS: TestCheckNumArgs (0.00s)
 === RUN   TestCheckNumArgsMinimum
@@ -85,6 +85,5 @@ ok  	github.com/deeper-x/svm	0.029s
 --- PASS: TestShowAll (0.00s)
 PASS
 ok  	github.com/deeper-x/svm/git	(cached)
-
 ```
 
