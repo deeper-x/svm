@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
-	"strconv"
-	"strings"
 
 	"github.com/deeper-x/svm/git"
 
@@ -24,31 +20,9 @@ func main() {
 }
 
 func svm() (string, error) {
-	semVer, err := git.GetCurVer()
+	tag, err := git.NewTag()
 	if err != nil {
 		return settings.DefaultErrMsg, err
-	}
-
-	digits := strings.Split(semVer, "v")[1]
-	numParts := strings.Split(digits, ".")
-
-	major := numParts[0]
-	minor := numParts[1]
-	patch := strings.TrimSuffix(numParts[2], "\n")
-
-	majorInt, err := strconv.Atoi(major)
-	if err != nil {
-		return settings.DefaultErrMsg, err
-	}
-
-	minorInt, err := strconv.Atoi(minor)
-	if err != nil {
-		return settings.DefaultErrMsg, err
-	}
-
-	patchInt, err := strconv.Atoi(patch)
-	if err != nil {
-		panic(err)
 	}
 
 	err = git.CheckNumArgs(2)
@@ -58,17 +32,17 @@ func svm() (string, error) {
 
 	switch action := os.Args[1]; action {
 	case "show":
-		cuVer, err := git.GetCurVer()
+		tag, err := git.NewTag()
 		if err != nil {
 			return settings.DefaultErrMsg, err
 		}
 
-		out := fmt.Sprintf("Current version: %s", cuVer)
+		out := fmt.Sprintf("Current version: %s\n", tag.String())
 		return out, nil
 
 	case "major":
-		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt+1, 0, 0)
-		err := git.SetNewVer(newVer)
+		newVer := fmt.Sprintf("v%d.%d.%d\n", tag.Major+1, 0, 0)
+		err := tag.SetNewVer(newVer)
 		if err != nil {
 			return settings.DefaultErrMsg, err
 		}
@@ -76,8 +50,8 @@ func svm() (string, error) {
 		return newVer, nil
 
 	case "minor":
-		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt, minorInt+1, 0)
-		err := git.SetNewVer(newVer)
+		newVer := fmt.Sprintf("v%d.%d.%d\n", tag.Major, tag.Minor+1, 0)
+		err := tag.SetNewVer(newVer)
 		if err != nil {
 			return settings.DefaultErrMsg, err
 		}
@@ -85,8 +59,8 @@ func svm() (string, error) {
 		return newVer, nil
 
 	case "patch":
-		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt, minorInt, patchInt+1)
-		err := git.SetNewVer(newVer)
+		newVer := fmt.Sprintf("v%d.%d.%d\n", tag.Major, tag.Minor, tag.Patch+1)
+		err := tag.SetNewVer(newVer)
 		if err != nil {
 			return settings.DefaultErrMsg, err
 		}
@@ -94,7 +68,7 @@ func svm() (string, error) {
 		return newVer, nil
 
 	case "undo":
-		res, err := undo()
+		res, err := tag.Undo()
 		if err != nil {
 			return settings.DefaultErrMsg, err
 		}
@@ -102,7 +76,7 @@ func svm() (string, error) {
 		return res, nil
 
 	case "all":
-		res, err := git.ShowAll()
+		res, err := tag.ShowAll()
 		if err != nil {
 			return settings.DefaultErrMsg, err
 		}
@@ -117,7 +91,7 @@ func svm() (string, error) {
 
 		fName := os.Args[2]
 
-		err := writeFile(fName)
+		err := tag.WriteFile(fName)
 		if err != nil {
 			return settings.DefaultErrMsg, err
 		}
@@ -127,32 +101,4 @@ func svm() (string, error) {
 	default:
 		return settings.DefaultErrMsg, errors.New(settings.DefaultOut)
 	}
-}
-
-func writeFile(fName string) error {
-	curVer, err := git.GetCurVer()
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(fName, []byte(curVer), 0644)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func undo() (string, error) {
-	cmd := exec.Command("bash", "-c", "git tag -d $( git tag -l --sort=creatordate | tail -n1 )")
-	stdout, err := cmd.Output()
-
-	if err != nil {
-		return settings.DefaultErrMsg, err
-	}
-
-	res := bytes.NewBuffer(stdout).String()
-
-	return res, nil
 }

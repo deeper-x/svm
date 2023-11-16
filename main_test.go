@@ -73,14 +73,24 @@ func TestWritre(t *testing.T) {
 }
 
 func TestSetNewVer(t *testing.T) {
-	err := git.SetNewVer("v1.100.0")
+	tag, err := git.NewTag()
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = tag.SetNewVer("v1.100.0")
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestDelVer(t *testing.T) {
-	err := git.DelVer("v1.100.0")
+	tag, err := git.NewTag()
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = tag.DelVer("v1.100.0")
 	if err != nil {
 		t.Error(err)
 	}

@@ -7,8 +7,8 @@ import (
 
 var testSemVer = "v.199.199.199"
 
-func TestGetCurVer(t *testing.T) {
-	_, err := GetCurVer()
+func TestNewTag(t *testing.T) {
+	_, err := NewTag()
 
 	if err != nil {
 		t.Error(err)
@@ -33,21 +33,37 @@ func TestCheckNumArgsMinimum(t *testing.T) {
 }
 
 func TestSetNewVer(t *testing.T) {
-	err := SetNewVer(testSemVer)
+	tag, err := NewTag()
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = tag.SetNewVer(testSemVer)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestDelVer(t *testing.T) {
-	err := DelVer(testSemVer)
+	tag, err := NewTag()
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = tag.DelVer(testSemVer)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestShowAll(t *testing.T) {
-	_, err := ShowAll()
+	tag, err := NewTag()
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, err = tag.ShowAll()
 	if err != nil {
 		t.Error(err)
 	}
