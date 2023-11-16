@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"testing"
 
@@ -29,7 +28,6 @@ func TestPatch(t *testing.T) {
 func TestMinor(t *testing.T) {
 	os.Args = []string{"svm", "minor"}
 
-	log.Println("redo")
 	_, err := svm()
 	if err != nil {
 		t.Error(err)

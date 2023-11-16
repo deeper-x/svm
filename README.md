@@ -55,7 +55,6 @@ $ make unittest
 === RUN   TestPatch
 --- PASS: TestPatch (0.00s)
 === RUN   TestMinor
-2023/11/16 20:58:51 redo
 --- PASS: TestMinor (0.00s)
 === RUN   TestMajor
 --- PASS: TestMajor (0.00s)
