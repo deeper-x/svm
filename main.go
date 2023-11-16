@@ -10,15 +10,16 @@ import (
 	"strings"
 )
 
-const defaultOut = "action required: [show | major | minor | patch | undo | all]"
+const defaultOut = "action required: [show | major | minor | patch | undo | all | write <file>]"
+const defaultErr = "no action executed"
 
 func main() {
 	out, err := svm()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
-	fmt.Println(out)
+	fmt.Print(out)
 }
 
 func svm() (string, error) {
@@ -32,17 +33,22 @@ func svm() (string, error) {
 
 	majorInt, err := strconv.Atoi(major)
 	if err != nil {
-		return "", err
+		return defaultErr, err
 	}
 
 	minorInt, err := strconv.Atoi(minor)
 	if err != nil {
-		return "", err
+		return defaultErr, err
 	}
 
 	patchInt, err := strconv.Atoi(patch)
 	if err != nil {
 		panic(err)
+	}
+
+	err = checkNumArgs(2)
+	if err != nil {
+		return defaultErr, err
 	}
 
 	switch action := os.Args[1]; action {
@@ -51,27 +57,28 @@ func svm() (string, error) {
 		return out, nil
 
 	case "major":
-		newVer := fmt.Sprintf("v%d.%d.%d", majorInt+1, minorInt, patchInt)
-		err := setNewVer(newVer, "major")
+		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt+1, minorInt, patchInt)
+		err := setNewVer(newVer)
 		if err != nil {
-			return newVer, err
+			return defaultErr, err
 		}
 
 		return newVer, nil
 
 	case "minor":
-		newVer := fmt.Sprintf("v%d.%d.%d", majorInt, minorInt+1, patchInt)
-		err := setNewVer(newVer, "minor")
+		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt, minorInt+1, patchInt)
+		err := setNewVer(newVer)
 		if err != nil {
-			return newVer, err
+			return defaultErr, err
 		}
+
 		return newVer, nil
 
 	case "patch":
-		newVer := fmt.Sprintf("v%d.%d.%d", majorInt, minorInt, patchInt+1)
-		err := setNewVer(newVer, "patch")
+		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt, minorInt, patchInt+1)
+		err := setNewVer(newVer)
 		if err != nil {
-			return newVer, err
+			return defaultErr, err
 		}
 
 		return newVer, nil
@@ -80,7 +87,7 @@ func svm() (string, error) {
 		cmd := exec.Command("bash", "-c", "git tag -d $( git tag -l --sort=creatordate | tail -n1 )")
 		stdout, err := cmd.Output()
 		if err != nil {
-			return "", err
+			return defaultErr, err
 		}
 		res := bytes.NewBuffer(stdout).String()
 
@@ -90,14 +97,29 @@ func svm() (string, error) {
 		cmd := exec.Command("bash", "-c", "git tag -l --sort=creatordate")
 		stdout, err := cmd.Output()
 		if err != nil {
-			return "", err
+			return defaultErr, err
 		}
 
 		res := bytes.NewBuffer(stdout).String()
 		return res, nil
 
+	case "write":
+		err = checkNumArgs(3)
+		if err != nil {
+			return defaultErr, err
+		}
+
+		fName := os.Args[2]
+		curVer := getCurVer()
+		err := os.WriteFile(fName, []byte(curVer), 0644)
+		if err != nil {
+			return defaultErr, err
+		}
+
+		return "Saved to file", nil
+
 	default:
-		return "", errors.New(defaultOut)
+		return defaultErr, errors.New(defaultOut)
 	}
 }
 
@@ -108,19 +130,32 @@ func getCurVer() string {
 		panic(err)
 	}
 
-	args := os.Args
-
-	if len(args) != 2 {
-		return defaultOut
-	}
-
 	var semVer = bytes.NewBuffer(stdout).String()
 	return semVer
 }
 
-func setNewVer(newVer, what string) error {
-	fmt.Printf("Setting new %s tag:\n", what)
-	cmd := exec.Command("git", "tag", newVer)
+func checkNumArgs(tot int) error {
+	if len(os.Args) < tot {
+		return errors.New(defaultOut)
+	}
+
+	return nil
+}
+
+func setNewVer(newVer string) error {
+	command := fmt.Sprintf("git tag %s", newVer)
+	cmd := exec.Command("bash", "-c", command)
+	_, err := cmd.Output()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func delVer(ver string) error {
+	action := fmt.Sprintf("git tag -d %s", ver)
+	cmd := exec.Command("bash", "-c", action)
 	_, err := cmd.Output()
 	if err != nil {
 		return err

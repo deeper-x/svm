@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"testing"
 )
@@ -9,8 +8,7 @@ import (
 func TestShow(t *testing.T) {
 	os.Args = []string{"svm", "show"}
 
-	out, err := svm()
-	fmt.Println(out)
+	_, err := svm()
 	if err != nil {
 		t.Error(err)
 	}
@@ -19,8 +17,7 @@ func TestShow(t *testing.T) {
 func TestPatch(t *testing.T) {
 	os.Args = []string{"svm", "patch"}
 
-	out, err := svm()
-	fmt.Println(out)
+	_, err := svm()
 	if err != nil {
 		t.Error(err)
 	}
@@ -29,8 +26,7 @@ func TestPatch(t *testing.T) {
 func TestMinor(t *testing.T) {
 	os.Args = []string{"svm", "minor"}
 
-	out, err := svm()
-	fmt.Println(out)
+	_, err := svm()
 	if err != nil {
 		t.Error(err)
 	}
@@ -39,8 +35,7 @@ func TestMinor(t *testing.T) {
 func TestMajor(t *testing.T) {
 	os.Args = []string{"svm", "major"}
 
-	out, err := svm()
-	fmt.Println(out)
+	_, err := svm()
 	if err != nil {
 		t.Error(err)
 	}
@@ -49,8 +44,7 @@ func TestMajor(t *testing.T) {
 func TestUndo(t *testing.T) {
 	os.Args = []string{"svm", "undo"}
 
-	out, err := svm()
-	fmt.Println(out)
+	_, err := svm()
 	if err != nil {
 		t.Error(err)
 	}
@@ -59,8 +53,30 @@ func TestUndo(t *testing.T) {
 func TestAll(t *testing.T) {
 	os.Args = []string{"svm", "all"}
 
-	out, err := svm()
-	fmt.Println(out)
+	_, err := svm()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestWritre(t *testing.T) {
+	os.Args = []string{"svm", "write", "test/out_file.txt"}
+
+	_, err := svm()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestSetNewVer(t *testing.T) {
+	err := setNewVer("v1.100.0")
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestDelVer(t *testing.T) {
+	err := delVer("v1.100.0")
 	if err != nil {
 		t.Error(err)
 	}
