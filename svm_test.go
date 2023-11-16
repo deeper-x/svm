@@ -1,8 +1,11 @@
 package main
 
 import (
+	"log"
 	"os"
 	"testing"
+
+	"github.com/deeper-x/svm/git"
 )
 
 func TestShow(t *testing.T) {
@@ -26,6 +29,7 @@ func TestPatch(t *testing.T) {
 func TestMinor(t *testing.T) {
 	os.Args = []string{"svm", "minor"}
 
+	log.Println("redo")
 	_, err := svm()
 	if err != nil {
 		t.Error(err)
@@ -69,14 +73,14 @@ func TestWritre(t *testing.T) {
 }
 
 func TestSetNewVer(t *testing.T) {
-	err := setNewVer("v1.100.0")
+	err := git.SetNewVer("v1.100.0")
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestDelVer(t *testing.T) {
-	err := delVer("v1.100.0")
+	err := git.DelVer("v1.100.0")
 	if err != nil {
 		t.Error(err)
 	}

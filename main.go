@@ -8,10 +8,11 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-)
 
-const defaultOut = "action required: [show | major | minor | patch | undo | all | write <file>]"
-const defaultErr = "no action executed"
+	"github.com/deeper-x/svm/git"
+
+	"github.com/deeper-x/svm/settings"
+)
 
 func main() {
 	out, err := svm()
@@ -23,22 +24,26 @@ func main() {
 }
 
 func svm() (string, error) {
-	semVer := getCurVer()
-	digits := strings.Split(semVer, "v")[1]
-	parts := strings.Split(digits, ".")
+	semVer, err := git.GetCurVer()
+	if err != nil {
+		return settings.DefaultErrMsg, err
+	}
 
-	major := parts[0]
-	minor := parts[1]
-	patch := strings.TrimSuffix(parts[2], "\n")
+	digits := strings.Split(semVer, "v")[1]
+	numParts := strings.Split(digits, ".")
+
+	major := numParts[0]
+	minor := numParts[1]
+	patch := strings.TrimSuffix(numParts[2], "\n")
 
 	majorInt, err := strconv.Atoi(major)
 	if err != nil {
-		return defaultErr, err
+		return settings.DefaultErrMsg, err
 	}
 
 	minorInt, err := strconv.Atoi(minor)
 	if err != nil {
-		return defaultErr, err
+		return settings.DefaultErrMsg, err
 	}
 
 	patchInt, err := strconv.Atoi(patch)
@@ -46,120 +51,108 @@ func svm() (string, error) {
 		panic(err)
 	}
 
-	err = checkNumArgs(2)
+	err = git.CheckNumArgs(2)
 	if err != nil {
-		return defaultErr, err
+		return settings.DefaultErrMsg, err
 	}
 
 	switch action := os.Args[1]; action {
 	case "show":
-		out := fmt.Sprintf("Current version: %s", getCurVer())
+		cuVer, err := git.GetCurVer()
+		if err != nil {
+			return settings.DefaultErrMsg, err
+		}
+
+		out := fmt.Sprintf("Current version: %s", cuVer)
 		return out, nil
 
 	case "major":
 		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt+1, 0, 0)
-		err := setNewVer(newVer)
+		err := git.SetNewVer(newVer)
 		if err != nil {
-			return defaultErr, err
+			return settings.DefaultErrMsg, err
 		}
 
 		return newVer, nil
 
 	case "minor":
 		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt, minorInt+1, 0)
-		err := setNewVer(newVer)
+		err := git.SetNewVer(newVer)
 		if err != nil {
-			return defaultErr, err
+			return settings.DefaultErrMsg, err
 		}
 
 		return newVer, nil
 
 	case "patch":
 		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt, minorInt, patchInt+1)
-		err := setNewVer(newVer)
+		err := git.SetNewVer(newVer)
 		if err != nil {
-			return defaultErr, err
+			return settings.DefaultErrMsg, err
 		}
 
 		return newVer, nil
 
 	case "undo":
-		cmd := exec.Command("bash", "-c", "git tag -d $( git tag -l --sort=creatordate | tail -n1 )")
-		stdout, err := cmd.Output()
+		res, err := undo()
 		if err != nil {
-			return defaultErr, err
+			return settings.DefaultErrMsg, err
 		}
-		res := bytes.NewBuffer(stdout).String()
 
 		return res, nil
 
 	case "all":
-		cmd := exec.Command("bash", "-c", "git tag -l --sort=creatordate")
-		stdout, err := cmd.Output()
+		res, err := git.ShowAll()
 		if err != nil {
-			return defaultErr, err
+			return settings.DefaultErrMsg, err
 		}
 
-		res := bytes.NewBuffer(stdout).String()
 		return res, nil
 
 	case "write":
-		err = checkNumArgs(3)
+		err = git.CheckNumArgs(3)
 		if err != nil {
-			return defaultErr, err
+			return settings.DefaultErrMsg, err
 		}
 
 		fName := os.Args[2]
-		curVer := getCurVer()
-		err := os.WriteFile(fName, []byte(curVer), 0644)
+
+		err := writeFile(fName)
 		if err != nil {
-			return defaultErr, err
+			return settings.DefaultErrMsg, err
 		}
 
 		return "Saved to file", nil
 
 	default:
-		return defaultErr, errors.New(defaultOut)
+		return settings.DefaultErrMsg, errors.New(settings.DefaultOut)
 	}
 }
 
-func getCurVer() string {
-	cmd := exec.Command("bash", "-c", "git tag -l --sort=creatordate | tail -n1")
+func writeFile(fName string) error {
+	curVer, err := git.GetCurVer()
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(fName, []byte(curVer), 0644)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func undo() (string, error) {
+	cmd := exec.Command("bash", "-c", "git tag -d $( git tag -l --sort=creatordate | tail -n1 )")
 	stdout, err := cmd.Output()
+
 	if err != nil {
-		panic(err)
+		return settings.DefaultErrMsg, err
 	}
 
-	var semVer = bytes.NewBuffer(stdout).String()
-	return semVer
-}
+	res := bytes.NewBuffer(stdout).String()
 
-func checkNumArgs(tot int) error {
-	if len(os.Args) < tot {
-		return errors.New(defaultOut)
-	}
-
-	return nil
-}
-
-func setNewVer(newVer string) error {
-	command := fmt.Sprintf("git tag %s", newVer)
-	cmd := exec.Command("bash", "-c", command)
-	_, err := cmd.Output()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func delVer(ver string) error {
-	action := fmt.Sprintf("git tag -d %s", ver)
-	cmd := exec.Command("bash", "-c", action)
-	_, err := cmd.Output()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return res, nil
 }
