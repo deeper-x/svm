@@ -57,7 +57,7 @@ func svm() (string, error) {
 		return out, nil
 
 	case "major":
-		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt+1, minorInt, patchInt)
+		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt+1, 0, 0)
 		err := setNewVer(newVer)
 		if err != nil {
 			return defaultErr, err
@@ -66,7 +66,7 @@ func svm() (string, error) {
 		return newVer, nil
 
 	case "minor":
-		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt, minorInt+1, patchInt)
+		newVer := fmt.Sprintf("v%d.%d.%d\n", majorInt, minorInt+1, 0)
 		err := setNewVer(newVer)
 		if err != nil {
 			return defaultErr, err

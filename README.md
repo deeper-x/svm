@@ -10,102 +10,63 @@ Usage:
 Example:
 ```sh
 justorius@XC-1660  (main)$ go build 
-justorius@XC-1660  (main)$ ./svm patch
-Setting new patch tag:
-v9.7.9
-justorius@XC-1660  (main)$ ./svm minor
-Setting new minor tag:
-v9.8.9
-justorius@XC-1660  (main)$ ./svm major
-Setting new major tag:
-v10.8.9
-justorius@XC-1660  (main)$ ./svm minor
-Setting new minor tag:
-v9.9.9
-justorius@XC-1660  (main)$ ./svm undo
-Deleted tag 'v9.9.9' (was 48422ba)
-
 justorius@XC-1660  (main)$ ./svm show
-Current version: v9.8.9
-
+Current version: v1.4.0
+justorius@XC-1660  (main)$ ./svm patch
+v1.4.1
+justorius@XC-1660  (main)$ ./svm minor
+v1.5.0
+justorius@XC-1660  (main)$ ./svm major
+v2.0.0
+justorius@XC-1660  (main)$ ./svm patch
+v2.0.1
+justorius@XC-1660  (main)$ ./svm patch
+v2.0.2
+justorius@XC-1660  (main)$ ./svm minor
+v2.1.0
+justorius@XC-1660  (main)$ ./svm undo
+Deleted tag 'v2.1.0' (was 2864110)
 justorius@XC-1660  (main)$ ./svm all
 v1.0.0
 v1.0.1
-v1.1.0
-[...]
-[...omissis...]
-[...]
-v9.7.7
-v9.7.8
-v9.7.9
-v9.8.9
+v1.1.1
+v1.1.2
+v1.2.2
+v1.2.3
+v1.3.3
+v1.3.4
+v1.4.0
+v1.4.1
+v1.5.0
+v2.0.0
+v2.0.1
+v2.0.2
+
 ```
 
 # test
 
 ```sh
-$ go test -v ./...
+justorius@XC-1660  (main)$ go test -v ./...
 === RUN   TestShow
-Current version: v9.8.9
-
 --- PASS: TestShow (0.00s)
 === RUN   TestPatch
-Setting new patch tag:
-v9.8.10
 --- PASS: TestPatch (0.00s)
 === RUN   TestMinor
-Setting new minor tag:
-v9.9.9
 --- PASS: TestMinor (0.00s)
 === RUN   TestMajor
-Setting new major tag:
-v10.9.9
 --- PASS: TestMajor (0.00s)
 === RUN   TestUndo
-Deleted tag 'v9.9.9' (was 48422ba)
-
---- PASS: TestUndo (0.01s)
+--- PASS: TestUndo (0.00s)
 === RUN   TestAll
-v1.0.0
-v1.0.1
-v1.1.0
-v10.5.3
-v10.5.4
-v10.6.5
-v10.6.6
-v10.8.9
-v10.9.9
-v2.0.0
-v2.0.1
-v2.1.1
-v3.1.1
-v4.1.1
-v5.1.1
-v6.1.1
-v7.1.1
-v7.2.1
-v7.2.2
-v8.2.2
-v8.3.2
-v8.3.3
-v8.4.3
-v8.5.3
-v9.5.3
-v9.5.4
-v9.5.5
-v9.5.6
-v9.6.6
-v9.7.6
-v9.7.7
-v9.7.8
-v9.7.9
-v9.8.10
-v9.8.9
-
 --- PASS: TestAll (0.00s)
+=== RUN   TestWritre
+--- PASS: TestWritre (0.01s)
+=== RUN   TestSetNewVer
+--- PASS: TestSetNewVer (0.00s)
+=== RUN   TestDelVer
+--- PASS: TestDelVer (0.00s)
 PASS
-ok  	github.com/deeper-x/svm	0.023s
-
-
+ok  	github.com/deeper-x/svm	0.040s
 ```
 
