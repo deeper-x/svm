@@ -4,7 +4,7 @@ With `svm` you can easily manage your project's semver. Set incrementally major,
 
 Usage:
 ```sh
-./svm [ show | all | major | minor | patch | undo ]
+./svm [ show | all | major | minor | patch | undo | write <file>]
 ```
 
 Example:
